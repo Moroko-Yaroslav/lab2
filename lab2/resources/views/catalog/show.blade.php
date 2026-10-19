@@ -1,0 +1,6 @@
+@extends('layouts.app')
+@section('title', $item['title'] . ' — StyleRent')
+@section('content')
+<section class="section"><a class="section__link" href="{{ route('catalog.index') }}">← До каталогу</a><div class="section__heading"><div><p class="section__eyebrow">{{ $item['category'] }} · {{ $item['operation'] }}</p><h1 class="section__title">{{ $item['title'] }}</h1></div></div>
+<div class="catalog-grid"><div class="catalog-card"><div class="catalog-card__media"><img class="catalog-card__image" src="{{ asset($item['image']) }}" alt="{{ $item['title'] }}"></div></div><div class="catalog-card"><div class="catalog-card__body"><strong class="catalog-card__price">{{ number_format($item['price'], 0, ',', ' ') }} {{ $item['currency'] }}</strong><p class="catalog-card__description">{{ $item['description'] }}</p><dl>@foreach($item['attributes'] as $name => $value)<dt><strong>{{ $name }}</strong></dt><dd>{{ $value }}</dd>@endforeach</dl><p>Контакт: {{ $item['contact_name'] }}</p><p>{{ $item['contact_phone'] }}</p><p>{{ $item['contact_email'] }}</p><button class="button" type="button" data-action="request" data-endpoint="/api/requests" data-item="{{ $item['id'] }}">Подати заявку на оренду</button></div></div></div></section>
+@endsection
