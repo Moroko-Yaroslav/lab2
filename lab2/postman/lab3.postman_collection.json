@@ -1,0 +1,362 @@
+{
+  "info": {
+    "_postman_id": "d2f233e9-a9b1-4305-9ea0-88bde9064ba5",
+    "name": "lab3",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "59217198",
+    "_collection_link": "https://go.postman.co/collection/59217198-d2f233e9-a9b1-4305-9ea0-88bde9064ba5?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Get All Products",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "\r\npm.test(\"Статус відповіді 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Відповідь містить масив товарів\", function () {\r\n    const json = pm.response.json();\r\n    pm.expect(json.data).to.be.an(\"array\");\r\n});\r\n\r\npm.test(\"У базі 12 товарів\", function () {\r\n    const json = pm.response.json();\r\n    pm.expect(json.meta.total).to.eql(12);\r\n});\r\n\r\npm.test(\"На сторінці 9 товарів\", function () {\r\n    const json = pm.response.json();\r\n    pm.expect(json.data.length).to.eql(9);\r\n});\r\n\r\npm.test(\"Пагінація присутня\", function () {\r\n    const json = pm.response.json();\r\n    pm.expect(json).to.have.property(\"links\");\r\n    pm.expect(json).to.have.property(\"meta\");\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/catalog",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "catalog"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Products Copy",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/catalog?q=Сукня",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "catalog"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "Сукня"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Products Copy 2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "\r\nconst expectedStatus = Number(\r\n    pm.variables.get(\"expected_status\") || 200\r\n);\r\n\r\npm.test(\"Правильний HTTP-статус\", function () {\r\n    pm.response.to.have.status(expectedStatus);\r\n});\r\n\r\npm.test(\"Відповідь у форматі JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\nif (expectedStatus === 200) {\r\n    pm.test(\"Відповідь містить дані\", function () {\r\n        const json = pm.response.json();\r\n        pm.expect(json).to.have.property(\"data\");\r\n    });\r\n}\r\n\r\nif (expectedStatus === 422) {\r\n    pm.test(\"Помилка валідації\", function () {\r\n        const json = pm.response.json();\r\n        pm.expect(json).to.have.property(\"errors\");\r\n    });\r\n}\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/catalog?category=Святковий",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "catalog"
+          ],
+          "query": [
+            {
+              "key": "category",
+              "value": "Святковий"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Products Copy 3",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "\r\nconst expectedStatus = Number(\r\n    pm.variables.get(\"expected_status\") || 200\r\n);\r\n\r\npm.test(\"Правильний HTTP-статус\", function () {\r\n    pm.response.to.have.status(expectedStatus);\r\n});\r\n\r\npm.test(\"Відповідь у форматі JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\nif (expectedStatus === 200) {\r\n    pm.test(\"Відповідь містить дані\", function () {\r\n        const json = pm.response.json();\r\n        pm.expect(json).to.have.property(\"data\");\r\n    });\r\n}\r\n\r\nif (expectedStatus === 422) {\r\n    pm.test(\"Помилка валідації\", function () {\r\n        const json = pm.response.json();\r\n        pm.expect(json).to.have.property(\"errors\");\r\n    });\r\n}\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/catalog?sort=price_asc",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "catalog"
+          ],
+          "query": [
+            {
+              "key": "sort",
+              "value": "price_asc"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Products Copy 4",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "\r\nconst expectedStatus = Number(\r\n    pm.variables.get(\"expected_status\") || 200\r\n);\r\n\r\npm.test(\"Правильний HTTP-статус\", function () {\r\n    pm.response.to.have.status(expectedStatus);\r\n});\r\n\r\npm.test(\"Відповідь у форматі JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\nif (expectedStatus === 200) {\r\n    pm.test(\"Відповідь містить дані\", function () {\r\n        const json = pm.response.json();\r\n        pm.expect(json).to.have.property(\"data\");\r\n    });\r\n}\r\n\r\nif (expectedStatus === 422) {\r\n    pm.test(\"Помилка валідації\", function () {\r\n        const json = pm.response.json();\r\n        pm.expect(json).to.have.property(\"errors\");\r\n    });\r\n}\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/catalog?page=2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "catalog"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "2"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Products Copy 5",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "\r\nconst expectedStatus = Number(\r\n    pm.variables.get(\"expected_status\") || 200\r\n);\r\n\r\npm.test(\"Правильний HTTP-статус\", function () {\r\n    pm.response.to.have.status(expectedStatus);\r\n});\r\n\r\npm.test(\"Відповідь у форматі JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\nif (expectedStatus === 200) {\r\n    pm.test(\"Відповідь містить дані\", function () {\r\n        const json = pm.response.json();\r\n        pm.expect(json).to.have.property(\"data\");\r\n    });\r\n}\r\n\r\nif (expectedStatus === 422) {\r\n    pm.test(\"Помилка валідації\", function () {\r\n        const json = pm.response.json();\r\n        pm.expect(json).to.have.property(\"errors\");\r\n    });\r\n}\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/catalog/komplekt-dlia-vistupu-scenicnii",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "catalog",
+            "komplekt-dlia-vistupu-scenicnii"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Products Copy 6",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "\r\nconst expectedStatus = Number(\r\n    pm.variables.get(\"expected_status\") || 200\r\n);\r\n\r\npm.test(\"Правильний HTTP-статус\", function () {\r\n    pm.response.to.have.status(expectedStatus);\r\n});\r\n\r\npm.test(\"Відповідь у форматі JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\nif (expectedStatus === 200) {\r\n    pm.test(\"Відповідь містить дані\", function () {\r\n        const json = pm.response.json();\r\n        pm.expect(json).to.have.property(\"data\");\r\n    });\r\n}\r\n\r\nif (expectedStatus === 422) {\r\n    pm.test(\"Помилка валідації\", function () {\r\n        const json = pm.response.json();\r\n        pm.expect(json).to.have.property(\"errors\");\r\n    });\r\n}\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/catalog/ne-isnuie",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "catalog",
+            "ne-isnuie"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Products Copy 7",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "\r\nconst expectedStatus = Number(\r\n    pm.variables.get(\"expected_status\") || 200\r\n);\r\n\r\npm.test(\"Правильний HTTP-статус\", function () {\r\n    pm.response.to.have.status(expectedStatus);\r\n});\r\n\r\npm.test(\"Відповідь у форматі JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\nif (expectedStatus === 200) {\r\n    pm.test(\"Відповідь містить дані\", function () {\r\n        const json = pm.response.json();\r\n        pm.expect(json).to.have.property(\"data\");\r\n    });\r\n}\r\n\r\nif (expectedStatus === 422) {\r\n    pm.test(\"Помилка валідації\", function () {\r\n        const json = pm.response.json();\r\n        pm.expect(json).to.have.property(\"errors\");\r\n    });\r\n}\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/catalog?sort=wrong",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "catalog"
+          ],
+          "query": [
+            {
+              "key": "sort",
+              "value": "wrong"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Products Copy 8",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "\r\nconst expectedStatus = Number(\r\n    pm.variables.get(\"expected_status\") || 200\r\n);\r\n\r\npm.test(\"Правильний HTTP-статус\", function () {\r\n    pm.response.to.have.status(expectedStatus);\r\n});\r\n\r\npm.test(\"Відповідь у форматі JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\nif (expectedStatus === 200) {\r\n    pm.test(\"Відповідь містить дані\", function () {\r\n        const json = pm.response.json();\r\n        pm.expect(json).to.have.property(\"data\");\r\n    });\r\n}\r\n\r\nif (expectedStatus === 422) {\r\n    pm.test(\"Помилка валідації\", function () {\r\n        const json = pm.response.json();\r\n        pm.expect(json).to.have.property(\"errors\");\r\n    });\r\n}\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/catalog?per_page=5",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "catalog"
+          ],
+          "query": [
+            {
+              "key": "per_page",
+              "value": "5"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

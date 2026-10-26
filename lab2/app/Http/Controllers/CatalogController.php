@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\CatalogFilterData;
+use App\Http\Requests\CatalogFilterRequest;
 use App\Services\CatalogService;
 
 class CatalogController extends Controller
@@ -11,10 +13,24 @@ class CatalogController extends Controller
     ) {
     }
 
-    public function index()
+    public function index(CatalogFilterRequest $request)
     {
+        $filters = CatalogFilterData::fromArray(
+            $request->validated()
+        );
+
+        $items = $this->catalog->paginate($filters);
+
+        $items->appends(
+            collect($request->validated())
+                ->except('page')
+                ->all()
+        );
+
         return view('catalog.index', [
-            'items' => $this->catalog->all()
+            'items' => $items,
+            'categories' => $this->catalog->categories(),
+            'filters' => $filters,
         ]);
     }
 
@@ -22,12 +38,8 @@ class CatalogController extends Controller
     {
         $item = $this->catalog->findBySlug($slug);
 
-        if ($item === null) {
-            abort(404);
-        }
-
         return view('catalog.show', [
-            'item' => $item
+            'item' => $item,
         ]);
     }
 }

@@ -2,102 +2,90 @@
 
 namespace App\Services;
 
-use Faker\Factory;
-use Illuminate\Support\Str;
+use App\Data\CatalogFilterData;
+use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class CatalogService
 {
-    private array $items = [];
-
-    public function __construct()
+    public function featured(int $limit = 3): Collection
     {
-        $variant = (int) config('catalog.variant', 1);
-        $profile = config("catalog.profiles.$variant");
-
-        if (!$profile) {
-            throw new \InvalidArgumentException(
-                "Невідомий варіант каталогу: $variant"
-            );
-        }
-
-        $faker = Factory::create('uk_UA');
-        $faker->seed((int) $profile['seed']);
-
-        $usedSlugs = [];
-
-        for ($i = 1; $i <= 12; $i++) {
-            $title = $profile['titles'][($i - 1) % count($profile['titles'])];
-            $category = $profile['categories'][($i - 1) % count($profile['categories'])];
-
-            $slug = Str::slug($title . '-' . $category);
-            $baseSlug = $slug;
-            $number = 2;
-
-            while (in_array($slug, $usedSlugs, true)) {
-                $slug = $baseSlug . '-' . $number;
-                $number++;
-            }
-
-            $usedSlugs[] = $slug;
-
-            $attributes = [];
-
-            foreach ($profile['attributes'] as $name => $values) {
-                $attributes[$name] = $faker->randomElement($values);
-            }
-
-            $this->items[] = [
-                'id' => $i,
-                'slug' => $slug,
-                'title' => $title,
-                'category' => $category,
-                'operation' => $profile['operation'],
-                'price' => $faker->numberBetween(
-                    $profile['price'][0],
-                    $profile['price'][1]
-                ),
-                'currency' => $profile['currency'],
-                'short_description' => $faker->sentence(8),
-                'description' => $faker->paragraph(4),
-                'image' => 'images/catalog-atlas.png',
-                'contact_name' => $faker->name(),
-                'contact_phone' => $faker->phoneNumber(),
-                'contact_email' => $faker->safeEmail(),
-                'status' => $i <= 3 ? 'featured' : 'active',
-                'published_at' => sprintf(
-                    '2026-09-%02d 12:00:00',
-                    $i
-                ),
-                'attributes' => $attributes,
-            ];
-        }
+        return Product::with('category')
+            ->where('status', 'featured')
+            ->orderBy('id')
+            ->limit(max(0, $limit))
+            ->get();
     }
 
-    public function featured(int $limit = 3): array
+    public function all(): Collection
     {
-        return array_slice(
-            array_values(array_filter(
-                $this->items,
-                fn ($item) => $item['status'] === 'featured'
-            )),
-            0,
-            max(0, $limit)
+        return Product::with('category')
+            ->orderBy('id')
+            ->get();
+    }
+
+    public function findBySlug(string $slug): Product
+    {
+        return Product::with('category')
+            ->where('slug', $slug)
+            ->firstOrFail();
+    }
+
+    public function categories(): Collection
+    {
+        return Category::orderBy('name')->get();
+    }
+
+    public function count(): int
+    {
+        return Product::count();
+    }
+
+    public function paginate(
+        CatalogFilterData $filters
+    ): LengthAwarePaginator {
+        $query = Product::with('category');
+
+        if ($filters->q !== null && $filters->q !== '') {
+            $query->where(function ($query) use ($filters) {
+                $query->where('title', 'like', '%' . $filters->q . '%')
+                    ->orWhere(
+                        'short_description',
+                        'like',
+                        '%' . $filters->q . '%'
+                    );
+            });
+        }
+
+        if ($filters->category) {
+            $query->whereHas('category', function ($query) use ($filters) {
+                $query->where('name', $filters->category);
+            });
+        }
+
+        if ($filters->operation) {
+            $query->where('operation', $filters->operation);
+        }
+
+        switch ($filters->sort) {
+            case 'price_asc':
+                $query->orderBy('price')->orderBy('id');
+                break;
+
+            case 'price_desc':
+                $query->orderByDesc('price')->orderByDesc('id');
+                break;
+
+            default:
+                $query->orderByDesc('published_at')->orderByDesc('id');
+                break;
+        }
+
+        return $query->paginate(
+            perPage: $filters->perPage,
+            page: $filters->page
         );
-    }
-
-    public function all(): array
-    {
-        return $this->items;
-    }
-
-    public function findBySlug(string $slug): ?array
-    {
-        foreach ($this->items as $item) {
-            if ($item['slug'] === $slug) {
-                return $item;
-            }
-        }
-
-        return null;
     }
 }
